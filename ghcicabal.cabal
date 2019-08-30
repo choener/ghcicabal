@@ -1,0 +1,92 @@
+cabal-version:  2.2
+name:           ghcicabal
+version:        0.0.0.1
+author:         Christian Hoener zu Siederdissen, 2019
+copyright:      Christian Hoener zu Siederdissen, 2019
+homepage:       https://github.com/choener/ghcicabal
+bug-reports:    https://github.com/choener/ghcicabal/issues
+maintainer:     choener@gmail.com
+category:       Distribution
+license:        GPL-3.0-or-later
+license-file:   LICENSE
+build-type:     Simple
+stability:      experimental
+tested-with:    GHC == 8.6.4
+synopsis:       todo
+description:
+                todo
+
+
+
+Extra-Source-Files:
+  changelog.md
+  README.md
+
+
+
+common deps
+  build-depends: base                   >= 4.7      && < 5.0
+               , Cabal
+               --
+  default-language:
+    Haskell2010
+  default-extensions: BangPatterns
+                    , ConstraintKinds
+                    , DataKinds
+                    , DeriveDataTypeable
+                    , DeriveFunctor
+                    , DeriveGeneric
+                    , FlexibleContexts
+                    , FlexibleInstances
+                    , LambdaCase
+                    , MultiParamTypeClasses
+                    , MultiWayIf
+                    , NamedFieldPuns
+                    , NumDecimals
+                    , OverloadedStrings
+                    , OverloadedLabels
+                    , PartialTypeSignatures
+                    , PolyKinds
+                    , QuasiQuotes
+                    , RecordWildCards
+                    , ScopedTypeVariables
+                    , StandaloneDeriving
+                    , TemplateHaskell
+                    , TypeApplications
+                    , TypeFamilies
+                    , TupleSections
+                    , TypeOperators
+                    , UndecidableInstances
+                    , UnicodeSyntax
+                    , ViewPatterns
+  ghc-options:
+    -O2
+    -funbox-strict-fields
+
+
+
+library
+  import: deps
+  exposed-modules:
+    Todo
+
+
+
+executable ghcicabal
+  import: deps
+  build-depends: base
+               --
+               , ghcicabal
+  hs-source-dirs:
+    src
+  main-is:
+    ghcicabal.hs
+  ghc-options:
+    -rtsopts
+
+
+
+source-repository head
+  type: git
+  location: git://github.com/choener/ghcicabal.git
+
