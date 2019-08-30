@@ -27,6 +27,10 @@ Extra-Source-Files:
 common deps
   build-depends: base                   >= 4.7      && < 5.0
                , Cabal
+               , containers
+               , process
+               , filemanip
+               , filepath
                --
   default-language:
     Haskell2010
@@ -65,18 +69,10 @@ common deps
 
 
 
-library
-  import: deps
-  exposed-modules:
-    Todo
-
-
-
 executable ghcicabal
   import: deps
   build-depends: base
                --
-               , ghcicabal
   hs-source-dirs:
     src
   main-is:
