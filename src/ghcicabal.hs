@@ -98,7 +98,7 @@ dirCheck ∷ [String] → FindClause Bool
 dirCheck = fmap not . foldM (\z i → contains i >>= return . (z||)) False
 
 main = do
-  Opts{..} ← execParser $ info opts (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
+  Opts{..} ← execParser $ info (opts <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
   let ds = if null oRootDirs then ["./"] else oRootDirs
   fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs ||? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
   ps ← mapM (readGenericPackageDescription silent) fs
