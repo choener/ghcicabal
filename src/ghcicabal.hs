@@ -39,7 +39,7 @@ data Opts = Opts
 
 opts ∷ Parser Opts
 opts = Opts
-  <$> (  some (argument str (metavar "DIRS..."))
+  <$> (  many (argument str (metavar "DIRS..."))
       )
   <*> option auto
       (  long "exclude"
