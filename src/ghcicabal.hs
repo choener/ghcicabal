@@ -5,7 +5,8 @@
 
 module Main where
 
-import Data.List (intersperse)
+import Control.Monad (foldM,liftM2)
+import Data.List (intersperse,isSuffixOf)
 import Distribution.PackageDescription.Parsec
 import Distribution.Pretty
 import Distribution.Types.BuildInfo
@@ -17,6 +18,7 @@ import Distribution.Types.Library
 import Distribution.Verbosity
 import GHC.Generics(Generic)
 import Language.Haskell.Extension
+import Options.Applicative
 import qualified Data.Set as S
 import qualified System.Process as P
 import System.Environment
@@ -25,6 +27,34 @@ import System.FilePath.Find as F
 import Text.Printf
 
 
+
+data Opts = Opts
+  { oRootDirs   ∷ [String]
+    -- ^ recursive parsing from these roots
+  , oIgnoreDirs ∷ [String]
+    -- ^ do not offer these directories to ghci. These contain submodules whose contents are compiled by nix.
+  , oMaxParseDepth  ∷ Int
+    -- ^ maximal depth to recursively parse
+  }
+
+opts ∷ Parser Opts
+opts = Opts
+  <$> (  some (argument str (metavar "DIRS..."))
+      )
+  <*> option auto
+      (  long "exclude"
+      <>  short 'x'
+      <> help "exclude these directories"
+      <> showDefault
+      <> value [ "./otherdeps" ]
+      )
+  <*> option auto
+      (  long "depth"
+      <> short 'd'
+      <> help "directory depth to search for *.cabal files"
+      <> showDefault
+      <> value 1
+      )
 
 -- | Extract the necessary information from all packages. Two @Info@s can be
 -- combined using @<>@, and the final @Info@ yields the correct environment.
@@ -64,10 +94,13 @@ extensions f p = cl <> mconcat csls <> mconcat cfls <> mconcat ces
 extString ∷ Extension → String
 extString = ("-X" ++) . prettyShow
 
+dirCheck ∷ [String] → FindClause Bool
+dirCheck = fmap not . foldM (\z i → contains i >>= return . (z||)) False
+
 main = do
-  as ← getArgs
-  let ds = if null as then ["./"] else as
-  fs ← concat <$> mapM (F.find always (extension ==? ".cabal")) ds
+  Opts{..} ← execParser $ info opts (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
+  let ds = if null oRootDirs then ["./"] else oRootDirs
+  fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs ||? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
   ps ← mapM (readGenericPackageDescription silent) fs
   let z = mconcat $ zipWith extensions fs ps
   -- cobble together the command line
