@@ -74,7 +74,7 @@ instance Monoid Info where
 -- | Creates an 'Info' from a 'BuildInfo'.
 
 mkInfo ∷ FilePath → BuildInfo → Info
-mkInfo f BuildInfo{..} = Info (S.fromList $ defaultExtensions ++ otherExtensions) (S.fromList $ map (dropFileName f </>) hsSourceDirs)
+mkInfo f BuildInfo{..} = Info (S.fromList $ defaultExtensions ++ otherExtensions) (S.fromList . map (dropFileName f </>) $ "./" : hsSourceDirs)
 
 
 -- | Given a filepath and a package description, return the 'Info'.
@@ -99,7 +99,7 @@ dirCheck = fmap not . foldM (\z i → contains i >>= return . (z||)) False
 
 main = do
   Opts{..} ← execParser $ info (opts <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
-  let ds = if null oRootDirs then ["./"] else oRootDirs
+  let ds = if null oRootDirs then ["./", "./deps"] else oRootDirs
   fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs ||? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
   ps ← mapM (readGenericPackageDescription silent) fs
   let z = mconcat $ zipWith extensions fs ps
