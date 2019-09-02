@@ -106,7 +106,7 @@ main = do
   -- cobble together the command line
   let cmdline = printf "ghci %s -i%s"
         -- all extensions
-        (concat . intersperse " " . map extString . S.toList $ iExts  z)
+        (concat . intersperse " " . S.toList . S.map extString $ iExts  z)
         -- all directories, extracted from cabal files
         (concat . intersperse ":" . S.toList $ iPaths z)
   putStrLn cmdline
