@@ -15,6 +15,7 @@ import Distribution.Types.Executable
 import Distribution.Types.ForeignLib
 import Distribution.Types.GenericPackageDescription
 import Distribution.Types.Library
+import Distribution.Types.TestSuite
 import Distribution.Verbosity
 import GHC.Generics(Generic)
 import Language.Haskell.Extension
@@ -80,7 +81,7 @@ mkInfo f BuildInfo{..} = Info (S.fromList $ defaultExtensions ++ otherExtensions
 -- | Given a filepath and a package description, return the 'Info'.
 
 extensions ∷ FilePath → GenericPackageDescription → Info
-extensions f p = cl <> mconcat csls <> mconcat cfls <> mconcat ces
+extensions f p = cl <> mconcat csls <> mconcat cfls <> mconcat ces <> mconcat cts
     -- TODO test suites and benchmarks
   where
     lib = libBuildInfo . condTreeData
@@ -88,6 +89,8 @@ extensions f p = cl <> mconcat csls <> mconcat cfls <> mconcat ces
     csls = [ mkInfo f $ lib t | (_,t) ← condSubLibraries p ]
     cfls = [ mkInfo f . foreignLibBuildInfo $ condTreeData t | (_,t) ← condForeignLibs p ]
     ces  = [ mkInfo f . buildInfo $ condTreeData t | (_,t) ← condExecutables p ]
+    -- test suites
+    cts  = [ mkInfo f . testBuildInfo $ condTreeData t | (_,t) ← condTestSuites p ]
 
 -- | Prepare 'Extension' as @ghci@ argument.
 
