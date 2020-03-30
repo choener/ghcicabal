@@ -78,6 +78,23 @@ executable ghcicabal
     src
   main-is:
     ghcicabal.hs
+  other-modules:
+    Common.hs
+  ghc-options:
+    -rtsopts
+
+
+
+executable buildcabal
+  import: deps
+  build-depends: base
+               --
+  hs-source-dirs:
+    src
+  main-is:
+    buildcabal.hs
+  other-modules:
+    Common.hs
   ghc-options:
     -rtsopts
 
