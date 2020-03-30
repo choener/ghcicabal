@@ -79,7 +79,7 @@ executable ghcicabal
   main-is:
     ghcicabal.hs
   other-modules:
-    Common.hs
+    Common
   ghc-options:
     -rtsopts
 
@@ -94,7 +94,7 @@ executable buildcabal
   main-is:
     buildcabal.hs
   other-modules:
-    Common.hs
+    Common
   ghc-options:
     -rtsopts
 
