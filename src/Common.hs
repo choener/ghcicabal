@@ -32,10 +32,14 @@ data Opts = Opts
     -- ^ do not offer these directories to ghci. These contain submodules whose contents are compiled by nix.
   , oMaxParseDepth  ∷ Int
     -- ^ maximal depth to recursively parse
+  , oWorkFile :: FilePath
   }
 
-opts ∷ Parser Opts
-opts = Opts
+pWorkFile :: Parser FilePath
+pWorkFile = argument str (metavar "FILE")
+
+opts ∷ Parser FilePath -> Parser Opts
+opts pfp = Opts
   <$> (  many (argument str (metavar "DIRS..."))
       )
   <*> option auto
@@ -52,6 +56,7 @@ opts = Opts
       <> showDefault
       <> value 1
       )
+  <*> pfp
 
 -- | Extract the necessary information from all packages. Two @Info@s can be
 -- combined using @<>@, and the final @Info@ yields the correct environment.
@@ -96,9 +101,9 @@ extString = ("-X" ++) . prettyShow
 dirCheck ∷ [String] → FindClause Bool
 dirCheck = fmap not . foldM (\z i → contains i >>= return . (z||)) False
 
-runMain :: String -> IO ()
-runMain exe = do
-  Opts{..} ← execParser $ info (opts <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
+runMain :: String -> Parser FilePath -> IO ()
+runMain exe pfp = do
+  Opts{..} ← execParser $ info (opts pfp <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
   let ds = if null oRootDirs then ["./", "./deps"] else oRootDirs
   fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs ||? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
   ps ← mapM (readGenericPackageDescription silent) fs

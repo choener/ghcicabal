@@ -9,5 +9,5 @@ import Common
 
 
 
-main = runMain "ghci"
+main = runMain "ghci" (pure "")
 
