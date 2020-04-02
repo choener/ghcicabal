@@ -40,7 +40,15 @@ pWorkFile = argument str (metavar "FILE")
 
 opts ∷ Parser FilePath -> Parser Opts
 opts pfp = Opts
+{-
   <$> (  many (argument str (metavar "DIRS..."))
+      ) -}
+  <$> option auto
+      (  long "root"
+      <>  short 'r'
+      <> help "root dirs"
+      <> showDefault
+      <> value [] --  "./otherdeps" ]
       )
   <*> option auto
       (  long "exclude"
@@ -109,11 +117,12 @@ runMain exe pfp = do
   ps ← mapM (readGenericPackageDescription silent) fs
   let z = mconcat $ zipWith extensions fs ps
   -- cobble together the command line
-  let cmdline = printf "%s %s -i%s" exe
+  let cmdline = printf "%s %s -i%s%s" exe
         -- all extensions
         (concat . intersperse " " . S.toList . S.map extString $ iExts  z)
         -- all directories, extracted from cabal files
         (concat . intersperse ":" . S.toList $ iPaths z)
+        (if null oWorkFile then "" else ' ': oWorkFile)
   putStrLn cmdline
   P.callCommand cmdline
 
