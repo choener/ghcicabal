@@ -9,5 +9,5 @@ import Common
 
 
 
-main = runMain "ghc -O3 -fllvm -outputdir .buildcabal" pWorkFile
+main = runMain "ghc -j -O3 -fllvm -outputdir .buildcabal" pWorkFile
 
