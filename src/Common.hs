@@ -107,13 +107,13 @@ extString ∷ Extension → String
 extString = ("-X" ++) . prettyShow
 
 dirCheck ∷ [String] → FindClause Bool
-dirCheck = fmap not . foldM (\z i → contains i >>= return . (z||)) False
+dirCheck = fmap not . foldM (\z i -> contains i >>= return . (z||)) False
 
 runMain :: String -> Parser FilePath -> IO ()
 runMain exe pfp = do
   Opts{..} ← execParser $ info (opts pfp <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
   let ds = if null oRootDirs then ["./", "./deps"] else oRootDirs
-  fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs ||? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
+  fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
   ps ← mapM (readGenericPackageDescription silent) fs
   let z = mconcat $ zipWith extensions fs ps
   -- cobble together the command line
