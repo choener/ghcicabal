@@ -22,6 +22,7 @@ import System.Environment
 import System.FilePath
 import System.FilePath.Find as F
 import Text.Printf
+import Debug.Trace
 
 
 
@@ -55,7 +56,7 @@ opts pfp = Opts
       <>  short 'x'
       <> help "exclude these directories"
       <> showDefault
-      <> value [ "./otherdeps" ]
+      <> value [ "otherdeps" ]
       )
   <*> option auto
       (  long "depth"
@@ -83,38 +84,41 @@ instance Monoid Info where
 
 -- | Creates an 'Info' from a 'BuildInfo'.
 
-mkInfo ∷ FilePath → BuildInfo → Info
+mkInfo ∷ FilePath -> BuildInfo -> Info
 mkInfo f BuildInfo{..} = Info (S.fromList $ defaultExtensions ++ otherExtensions) (S.fromList . map (dropFileName f </>) $ "./" : hsSourceDirs)
 
 
 -- | Given a filepath and a package description, return the 'Info'.
 
-extensions ∷ FilePath → GenericPackageDescription → Info
+extensions ∷ FilePath -> GenericPackageDescription -> Info
 extensions f p = cl <> mconcat csls <> mconcat cfls <> mconcat ces <> mconcat cts
     -- TODO test suites and benchmarks
   where
     lib = libBuildInfo . condTreeData
     cl   = maybe mempty (mkInfo f . lib) (condLibrary p)
-    csls = [ mkInfo f $ lib t | (_,t) ← condSubLibraries p ]
-    cfls = [ mkInfo f . foreignLibBuildInfo $ condTreeData t | (_,t) ← condForeignLibs p ]
-    ces  = [ mkInfo f . buildInfo $ condTreeData t | (_,t) ← condExecutables p ]
+    csls = [ mkInfo f $ lib t | (_,t) <- condSubLibraries p ]
+    cfls = [ mkInfo f . foreignLibBuildInfo $ condTreeData t | (_,t) <- condForeignLibs p ]
+    ces  = [ mkInfo f . buildInfo $ condTreeData t | (_,t) <- condExecutables p ]
     -- test suites
-    cts  = [ mkInfo f . testBuildInfo $ condTreeData t | (_,t) ← condTestSuites p ]
+    cts  = [ mkInfo f . testBuildInfo $ condTreeData t | (_,t) <- condTestSuites p ]
 
 -- | Prepare 'Extension' as @ghci@ argument.
 
-extString ∷ Extension → String
+extString ∷ Extension -> String
 extString = ("-X" ++) . prettyShow
 
-dirCheck ∷ [String] → FindClause Bool
-dirCheck = fmap not . foldM (\z i -> contains i >>= return . (z||)) False
+-- | Each @i@ is a directory to ignore. So @i \in ["./ignore"]@ should have us ignore directories
+-- under ignore.
+
+dirCheck ∷ [String] -> FindClause Bool
+dirCheck = fmap not . foldM (\z i -> (canonicalPath ~~? i) >>= return . (z||)) False
 
 runMain :: String -> Parser FilePath -> IO ()
 runMain exe pfp = do
-  Opts{..} ← execParser $ info (opts pfp <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019")
-  let ds = if null oRootDirs then ["./", "./deps"] else oRootDirs
-  fs ← concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
-  ps ← mapM (readGenericPackageDescription silent) fs
+  Opts{..} <- execParser $ info (opts pfp <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019-2020")
+  let ds = if null oRootDirs then ["./", "deps"] else oRootDirs
+  fs <- concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
+  ps <- mapM (readGenericPackageDescription silent) fs
   let z = mconcat $ zipWith extensions fs ps
   -- cobble together the command line
   let cmdline = printf "%s %s -i%s%s" exe
