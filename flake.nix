@@ -8,13 +8,13 @@
 
   outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (
     system: let
-      pkgs = import nixpkgs { inherit system; overlays = [ ghcicabal ]; };
-      ghcicabal = self: super: {
-        ghcicabal = self.haskellPackages.callPackage ./default.nix {};
+      pkgs = import nixpkgs { inherit system; overlays = [ over ]; };
+      over = final: prev: {
+        ghcicabal = final.haskellPackages.callPackage ./default.nix {};
       };
     in {
       defaultPackage = pkgs.ghcicabal;
-      overlay = final: prev: { ghcicabal = final.haskellPackages.callPackage ./default.nix {}; };
+      overlay = over;
     }
   );
 
