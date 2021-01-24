@@ -14,6 +14,7 @@
       };
     in {
       defaultPackage = pkgs.ghcicabal;
+      overlay = final: prev: final.haskellPackages.callPackage ./default.nix {};
     }
   );
 
