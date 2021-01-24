@@ -1,8 +1,8 @@
 cabal-version:  2.2
 name:           ghcicabal
 version:        0.0.0.1
-author:         Christian Hoener zu Siederdissen, 2019
-copyright:      Christian Hoener zu Siederdissen, 2019
+author:         Christian Hoener zu Siederdissen, 2019-2021
+copyright:      Christian Hoener zu Siederdissen, 2019-2021
 homepage:       https://github.com/choener/ghcicabal
 bug-reports:    https://github.com/choener/ghcicabal/issues
 maintainer:     choener@gmail.com
@@ -11,7 +11,7 @@ license:        GPL-3.0-or-later
 license-file:   LICENSE
 build-type:     Simple
 stability:      experimental
-tested-with:    GHC == 8.6.4
+tested-with:    GHC == 8.8.4
 synopsis:       todo
 description:
                 todo
