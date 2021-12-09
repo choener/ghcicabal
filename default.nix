@@ -1,5 +1,5 @@
-{ mkDerivation, base, Cabal, containers, filemanip, filepath
-, optparse-applicative, process, stdenv
+{ mkDerivation, base, Cabal, containers, filemanip, filepath, lib
+, optparse-applicative, process
 }:
 mkDerivation {
   pname = "ghcicabal";
@@ -13,5 +13,5 @@ mkDerivation {
   ];
   homepage = "https://github.com/choener/ghcicabal";
   description = "todo";
-  license = stdenv.lib.licenses.gpl3Plus;
+  license = lib.licenses.gpl3Plus;
 }
