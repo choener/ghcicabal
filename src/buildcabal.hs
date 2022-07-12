@@ -9,5 +9,5 @@ import Common
 
 
 
-main = runMain "ghc -j -O3 -fllvm -rtsopts -threaded -ddump-to-file -ddump-simpl -dsuppress-all -outputdir .buildcabal" pWorkFile
+main = runMain "ghc -j -O3 -fllvm -optlo-O3 -rtsopts -threaded -ddump-to-file -ddump-simpl -dsuppress-all -outputdir .buildcabal" pWorkFile
 
