@@ -1,0 +1,13 @@
+cradle:
+  cabal:
+    - path: "src/buildcabal.hs"
+      component: "ghcicabal:exe:buildcabal"
+
+    - path: "src/Common.hs"
+      component: "ghcicabal:exe:buildcabal"
+
+    - path: "src/ghcicabal.hs"
+      component: "ghcicabal:exe:ghcicabal"
+
+    - path: "src/Common.hs"
+      component: "ghcicabal:exe:ghcicabal"
