@@ -1,5 +1,5 @@
-{ mkDerivation, base, Cabal, containers, filemanip, filepath, lib
-, optparse-applicative, process
+{ mkDerivation, base, Cabal, containers, filemanip, filepath, hpack
+, lib, optparse-applicative, process
 }:
 mkDerivation {
   pname = "ghcicabal";
@@ -8,7 +8,7 @@ mkDerivation {
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    base Cabal containers filemanip filepath optparse-applicative
+    base Cabal containers filemanip filepath hpack optparse-applicative
     process
   ];
   homepage = "https://github.com/choener/ghcicabal";

@@ -117,9 +117,13 @@ runMain :: String -> Parser FilePath -> IO ()
 runMain exe pfp = do
   Opts{..} <- execParser $ info (opts pfp <**> helper) (fullDesc <> progDesc "run ghcicabal" <> header "ghcicabal: (c) Christian Hoener zu Siederdissen, 2019-2020")
   let ds = if null oRootDirs then ["./", "deps"] else oRootDirs
-  fs <- concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
-  ps <- mapM (readGenericPackageDescription silent) fs
-  let z = mconcat $ zipWith extensions fs ps
+  -- cabal related
+  cs <- concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (extension ==? ".cabal")) ds
+  ps <- mapM (readGenericPackageDescription silent) $ cs
+  let z = mconcat $ zipWith extensions cs ps
+  -- hpack related
+  ys <- concat <$> mapM (F.find (dirCheck oIgnoreDirs &&? depth <=? oMaxParseDepth) (fileName ==? "package.yaml")) ds
+  -- TODO parse package.yaml files and create extensions
   -- cobble together the command line
   let cmdline = printf "%s %s -i%s%s" exe
         -- all extensions
