@@ -11,6 +11,7 @@
       haskellPackages = (prev.haskellPackages.override { overrides = hself: hsuper: {
         ghcicabal = final.haskellPackages.callPackage ./default.nix {};
       }; });
+      ghcicabal = final.haskellPackages.ghcicabal;
     };
   in flake-utils.lib.eachDefaultSystem (
     system: let
