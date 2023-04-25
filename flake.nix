@@ -7,9 +7,9 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }: let
-    over = final: prev: {
+    over = final: prev: rec {
       haskellPackages = (prev.haskellPackages.override { overrides = hself: hsuper: {
-        ghcicabal = final.haskellPackages.callPackage ./default.nix {};
+        ghcicabal = haskellPackages.callPackage ./default.nix {};
       }; });
       ghcicabal = final.haskellPackages.ghcicabal;
     };
