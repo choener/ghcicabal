@@ -27,6 +27,9 @@
         ghcicabal = { type = "app"; program = "${pkgs.haskellPackages.ghcicabal}/bin/ghcicabal"; };
         buildcabal = { type = "app"; program = "${pkgs.haskellPackages.ghcicabal}/bin/buildcabal"; };
       };
+      packages = {
+        ghcicabal = pkgs.haskellPackages.ghcicabal;
+      };
     }
   ) // { overlay = over; };
 
